@@ -1911,6 +1911,20 @@ Off by default."
   (interactive)
   (lsp-bridge-call-file-api "find_references" (lsp-bridge--position)))
 
+(defun lsp-bridge-rust-expand-macro ()
+  (interactive)
+  (lsp-bridge-call-file-api "expand_macro" (lsp-bridge--position)))
+
+(defun lsp-bridge-rust-expand-macro-callback (name expansion)
+  ;; The name is macro name, not project name, you maybe want to replace it
+  (let ((buf (get-buffer-create (format "*rust macro expansion `%s'*" name))))
+    (with-current-buffer buf
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert expansion)
+        (rust-mode)))
+    (switch-to-buffer-other-window buf)))
+
 (defun lsp-bridge-find-def-fallback (position)
   (if (not (= (length lsp-bridge-peek-ace-list) 0))
       (progn
